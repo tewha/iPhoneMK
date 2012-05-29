@@ -35,15 +35,17 @@
 
 @implementation MKNumberBadgeView
 @synthesize value=_value;
-@synthesize shadow=_shadow;
-@synthesize shine=_shine;
-@synthesize font=_font;
-@synthesize fillColor=_fillColor;
-@synthesize strokeColor=_strokeColor;
-@synthesize textColor=_textColor;
-@synthesize alignment=_alignment;
+@synthesize shadow;
+@synthesize shadowOffset;
+@synthesize shine;
+@synthesize font;
+@synthesize fillColor;
+@synthesize strokeColor;
+@synthesize textColor;
+@synthesize alignment;
 @dynamic badgeSize;
-@synthesize pad=_pad;
+@synthesize pad;
+@synthesize hideWhenZero;
 
 - (id)initWithFrame:(CGRect)frame 
 {
@@ -72,24 +74,26 @@
 - (void)initState;
 {	
 	self.opaque = NO;
-	self.pad = 4;
+	self.pad = 2;
 	self.font = [UIFont boldSystemFontOfSize:16];
 	self.shadow = YES;
+	self.shadowOffset = CGSizeMake(0, 3);
 	self.shine = YES;
 	self.alignment = UITextAlignmentCenter;
 	self.fillColor = [UIColor redColor];
 	self.strokeColor = [UIColor whiteColor];
 	self.textColor = [UIColor whiteColor];
+    self.hideWhenZero = NO;
 	
 	self.backgroundColor = [UIColor clearColor];
 }
 
 - (void)dealloc 
 {
-	[_font release];
-	[_fillColor release];
-	[_strokeColor release];
-	[_textColor release];
+//	[_font release];
+//	[_fillColor release];
+//	[_strokeColor release];
+//	[_textColor release];
 	
     [super dealloc];
 }
@@ -115,12 +119,18 @@
 	badgeRect.size.width = ceil( badgeRect.size.width );
 	badgeRect.size.height = ceil( badgeRect.size.height );
 	
+    
+    CGFloat lineWidth = 2.0;
 	
 	CGContextSaveGState( curContext );
-	CGContextSetLineWidth( curContext, 2.0 );
+	CGContextSetLineWidth( curContext, lineWidth );
 	CGContextSetStrokeColorWithColor(  curContext, self.strokeColor.CGColor  );
 	CGContextSetFillColorWithColor( curContext, self.fillColor.CGColor );
-		
+	
+	// Line stroke straddles the path, so we need to account for the outer portion
+	badgeRect.size.width += ceilf( lineWidth / 2 );
+	badgeRect.size.height += ceilf( lineWidth / 2 );
+	
 	CGPoint ctm;
 	
 	switch (self.alignment) 
@@ -143,9 +153,7 @@
 	{
 		CGContextSaveGState( curContext );
 
-		CGSize blurSize;
-		blurSize.width = 0;
-		blurSize.height = -3;
+		CGSize blurSize = self.shadowOffset;
 		UIColor* blurColor = [[UIColor blackColor] colorWithAlphaComponent:0.5];
 		
 		CGContextSetShadowWithColor( curContext, blurSize, 4, blurColor.CGColor );
@@ -250,6 +258,15 @@
 - (void)setValue:(NSUInteger)inValue
 {
 	_value = inValue;
+    
+    if (self.hideWhenZero == YES && _value == 0)
+    {
+        self.hidden = YES;
+    }
+    else
+    {
+        self.hidden = NO;
+    }
 	
 	[self setNeedsDisplay];
 }

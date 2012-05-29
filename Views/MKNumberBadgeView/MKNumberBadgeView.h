@@ -35,17 +35,6 @@
 @interface MKNumberBadgeView : UIView 
 {
 	NSUInteger _value;
-	
-	UIFont* _font;
-	UIColor* _fillColor;
-	UIColor* _strokeColor;
-	UIColor* _textColor;
-	NSUInteger _pad;
-	
-	BOOL _shadow;
-	BOOL _shine;
-	
-	UITextAlignment _alignment;
 }
 
 // The current value displayed in the badge. Updating the value will update the view's display
@@ -53,6 +42,9 @@
 
 // Indicates whether the badge view draws a dhadow or not.
 @property (assign,nonatomic) BOOL shadow;
+
+// The offset for the shadow, if there is one.
+@property (assign,nonatomic) CGSize shadowOffset;
 
 // Indicates whether the badge view should be drawn with a shine
 @property (assign,nonatomic) BOOL shine;
@@ -80,5 +72,8 @@
 // The number of pixels between the number inside the badge and the stroke around the badge. This value 
 // is approximate, as the font geometry might effectively slightly increase or decrease the apparent pad.
 @property (nonatomic) NSUInteger pad;
+
+// If YES, the badge will be hidden when the value is 0
+@property (nonatomic) BOOL hideWhenZero;
 
 @end
